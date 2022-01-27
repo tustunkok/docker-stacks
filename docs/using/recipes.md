@@ -27,7 +27,7 @@ Create a new Dockerfile like the one shown below.
 
 ```dockerfile
 # Start from a core stack version
-FROM jupyter/datascience-notebook:33add21fab64
+FROM jupyter/datascience-notebook:b418b67c225b
 # Install in the default python3 environment
 RUN pip install --quiet --no-cache-dir 'flake8==3.9.2' && \
     fix-permissions "${CONDA_DIR}" && \
@@ -46,7 +46,7 @@ Next, create a new Dockerfile like the one shown below.
 
 ```dockerfile
 # Start from a core stack version
-FROM jupyter/datascience-notebook:33add21fab64
+FROM jupyter/datascience-notebook:b418b67c225b
 # Install from requirements.txt file
 COPY --chown=${NB_UID}:${NB_GID} requirements.txt /tmp/
 RUN pip install --quiet --no-cache-dir --requirement /tmp/requirements.txt && \
@@ -58,7 +58,7 @@ For conda, the Dockerfile is similar:
 
 ```dockerfile
 # Start from a core stack version
-FROM jupyter/datascience-notebook:33add21fab64
+FROM jupyter/datascience-notebook:b418b67c225b
 # Install from requirements.txt file
 COPY --chown=${NB_UID}:${NB_GID} requirements.txt /tmp/
 RUN mamba install --yes --file /tmp/requirements.txt && \
@@ -136,14 +136,6 @@ ENV PATH "${CONDA_DIR}/envs/${conda_env}/bin:${PATH}"
 # if you want this environment to be the default one, uncomment the following line:
 # ENV CONDA_DEFAULT_ENV ${conda_env}
 ```
-
-## Run JupyterLab
-
-JupyterLab is preinstalled as a notebook extension starting in tag
-[c33a7dc0eece](https://github.com/jupyter/docker-stacks/pull/355).
-
-Run jupyterlab using a command such as
-`docker run -it --rm -p 8888:8888 -e JUPYTER_ENABLE_LAB=yes jupyter/datascience-notebook`
 
 ## Dask JupyterLab Extension
 
@@ -319,7 +311,7 @@ To use a specific version of JupyterHub, the version of `jupyterhub` in your ima
 version in the Hub itself.
 
 ```dockerfile
-FROM jupyter/base-notebook:33add21fab64
+FROM jupyter/base-notebook:b418b67c225b
 RUN pip install --quiet --no-cache-dir jupyterhub==1.4.1 && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
@@ -493,13 +485,13 @@ In this case, you should use the `start.sh` script to launch the server with no 
 For jupyterlab:
 
 ```bash
-docker run jupyter/base-notebook:33add21fab64 start.sh jupyter lab --LabApp.token=''
+docker run jupyter/base-notebook:b418b67c225b start.sh jupyter lab --LabApp.token=''
 ```
 
 For jupyter classic:
 
 ```bash
-docker run jupyter/base-notebook:33add21fab64 start.sh jupyter notebook --NotebookApp.token=''
+docker run jupyter/base-notebook:b418b67c225b start.sh jupyter notebook --NotebookApp.token=''
 ```
 
 ## Enable nbextension spellchecker for markdown (or any other nbextension)
@@ -530,7 +522,7 @@ By adding the properties to `spark-defaults.conf`, the user no longer needs to e
 ```dockerfile
 FROM jupyter/pyspark-notebook:latest
 
-ARG DELTA_CORE_VERSION="1.0.0"
+ARG DELTA_CORE_VERSION="1.1.0"
 RUN pip install --quiet --no-cache-dir delta-spark==${DELTA_CORE_VERSION} && \
      fix-permissions "${HOME}" && \
      fix-permissions "${CONDA_DIR}"
@@ -548,4 +540,21 @@ RUN echo "from pyspark.sql import SparkSession" > /tmp/init-delta.py && \
     echo "spark = configure_spark_with_delta_pip(SparkSession.builder).getOrCreate()" >> /tmp/init-delta.py && \
     python /tmp/init-delta.py && \
     rm /tmp/init-delta.py
+```
+
+## Add Custom Font in Scipy notebook
+
+The example below is a Dockerfile to load Source Han Sans with normal weight which is usually used for web.
+
+```dockerfile
+FROM jupyter/scipy-notebook:latest
+
+RUN PYV=$(ls "${CONDA_DIR}/lib" | grep ^python) && \
+    MPL_DATA="${CONDA_DIR}/lib/${PYV}/site-packages/matplotlib/mpl-data" && \
+    wget --quiet -P "${MPL_DATA}/fonts/ttf/" https://mirrors.cloud.tencent.com/adobe-fonts/source-han-sans/SubsetOTF/CN/SourceHanSansCN-Normal.otf && \
+    sed -i 's/#font.family/font.family/g' "${MPL_DATA}/matplotlibrc" && \
+    sed -i 's/#font.sans-serif:/font.sans-serif: Source Han Sans CN,/g' "${MPL_DATA}/matplotlibrc" && \
+    sed -i 's/#axes.unicode_minus: True/axes.unicode_minus: False/g' "${MPL_DATA}/matplotlibrc" && \
+    rm -rf "/home/${NB_USER}/.cache/matplotlib" && \
+    python -c 'import matplotlib.font_manager;print("font loaded: ",("Source Han Sans CN" in [f.name for f in matplotlib.font_manager.fontManager.ttflist]))'
 ```

@@ -5,8 +5,6 @@ plumbum
 pre-commit
 pytest
 requests
-sphinx>=2.1
+sphinx
 sphinx-copybutton
-sphinx-intl
 tabulate
-transifex-client

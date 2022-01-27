@@ -3,17 +3,22 @@ name: Build Sphinx Documentation
 on:
   pull_request:
     paths:
-      - "docs/**"
       - ".github/workflows/sphinx.yml"
+
+      - "docs/**"
       - ".readthedocs.yaml"
+      - "requirements-dev.txt"
   push:
     branches:
-      - master
       - main
+      - master
     paths:
-      - "docs/**"
       - ".github/workflows/sphinx.yml"
+
+      - "docs/**"
       - ".readthedocs.yaml"
+      - "requirements-dev.txt"
+  workflow_dispatch:
 
 jobs:
   build-docs:
@@ -21,9 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: >
-      !contains(github.event.head_commit.message , 'ci skip') &&
-      !contains(github.event.pull_request.title, 'ci skip')
 
     steps:
       - name: Checkout Repo
@@ -41,15 +43,3 @@ jobs:
 
       - name: Build Documentation
         run: make docs
-
-      - name: Extract Source Strings
-        working-directory: docs
-        run: |
-          sphinx-build -M gettext ./ ./_build/
-          sphinx-intl update -p ./_build/gettext -l en
-
-      - name: Push Strings to Master
-        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@abd87b7d94702070bef78dc1d56b6928b8fa9ecc # dependabot updates to latest release
-        with:
-          commit_message: "[ci skip] Automated publish for ${{github.sha}}"

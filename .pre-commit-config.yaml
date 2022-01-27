@@ -5,30 +5,37 @@ ci:
 repos:
   # Autoupdate: Python code
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.29.0
+    rev: v2.31.0
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
 
   # Autoformat: Python code
   - repo: https://github.com/psf/black
-    rev: 21.9b0
+    rev: 21.12b0
     hooks:
       - id: black
         args: [--target-version=py39]
 
+  # Check python code static typing
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.931
+    hooks:
+      - id: mypy
+        additional_dependencies: ["pytest", "types-requests", "types-tabulate"]
+
   # Autoformat: YAML, JSON, Markdown, etc.
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.4.1
+    rev: v2.5.1
     hooks:
       - id: prettier
 
   # Lint: Dockerfile
   - repo: https://github.com/hadolint/hadolint.git
-    rev: v2.7.0
+    rev: v2.8.0
     hooks:
       - id: hadolint-docker
-        entry: hadolint/hadolint:v2.7.0 hadolint
+        entry: hadolint/hadolint:v2.8.0 hadolint
 
   # Lint: YAML
   - repo: https://github.com/adrienverge/yamllint.git
@@ -47,7 +54,7 @@ repos:
 
   # Lint: Shell scripts
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.7.2.1
+    rev: v0.8.0.3
     hooks:
       - id: shellcheck
         args: ["-x"]
@@ -60,7 +67,7 @@ repos:
 
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.29.0
+    rev: v0.30.0
     hooks:
       - id: markdownlint
         args: ["--fix"]

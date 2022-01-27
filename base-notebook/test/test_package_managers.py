@@ -2,7 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 
 import logging
-import pytest
+import pytest  # type: ignore
+
+from conftest import TrackedContainer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -17,18 +19,15 @@ LOGGER = logging.getLogger(__name__)
         ("pip", "--version"),
     ],
 )
-def test_package_manager(container, package_manager, version_arg):
+def test_package_manager(
+    container: TrackedContainer, package_manager: str, version_arg: tuple[str, ...]
+) -> None:
     """Test the notebook start-notebook script"""
     LOGGER.info(
         f"Test that the package manager {package_manager} is working properly ..."
     )
-    c = container.run(
+    container.run_and_wait(
+        timeout=5,
         tty=True,
         command=["start.sh", "bash", "-c", f"{package_manager} {version_arg}"],
     )
-    rv = c.wait(timeout=5)
-    logs = c.logs(stdout=True).decode("utf-8")
-    LOGGER.debug(logs)
-    assert (
-        rv == 0 or rv["StatusCode"] == 0
-    ), f"Package manager {package_manager} not working"

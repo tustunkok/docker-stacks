@@ -2,7 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 import logging
 
-import pytest
+import pytest  # type: ignore
+
+from conftest import TrackedContainer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ LOGGER = logging.getLogger(__name__)
         "jupyter-matplotlib",
     ],
 )
-def test_check_extension(container, extension):
+def test_check_extension(container: TrackedContainer, extension: str) -> None:
     """Basic check of each extension
 
     The list of extensions can be obtained through this command
@@ -25,11 +27,8 @@ def test_check_extension(container, extension):
 
     """
     LOGGER.info(f"Checking the extension: {extension} ...")
-    c = container.run(
+    container.run_and_wait(
+        timeout=10,
         tty=True,
         command=["start.sh", "jupyter", "labextension", "check", extension],
     )
-    rv = c.wait(timeout=10)
-    logs = c.logs(stdout=True).decode("utf-8")
-    LOGGER.debug(logs)
-    assert rv == 0 or rv["StatusCode"] == 0, f"Extension {extension} check failed"

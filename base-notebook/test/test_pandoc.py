@@ -3,16 +3,16 @@
 
 import logging
 
+from conftest import TrackedContainer
+
 LOGGER = logging.getLogger(__name__)
 
 
-def test_pandoc(container):
+def test_pandoc(container: TrackedContainer) -> None:
     """Pandoc shall be able to convert MD to HTML."""
-    c = container.run(
+    logs = container.run_and_wait(
+        timeout=10,
         tty=True,
         command=["start.sh", "bash", "-c", 'echo "**BOLD**" | pandoc'],
     )
-    c.wait(timeout=10)
-    logs = c.logs(stdout=True).decode("utf-8")
-    LOGGER.debug(logs)
     assert "<p><strong>BOLD</strong></p>" in logs

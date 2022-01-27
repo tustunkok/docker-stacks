@@ -1,15 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-import logging
 from plumbum.cmd import docker
+from docker.models.containers import Container
 from .docker_runner import DockerRunner
 from .git_helper import GitHelper
 
 
-logger = logging.getLogger(__name__)
-
-
-def quoted_output(container, cmd: str) -> str:
+def quoted_output(container: Container, cmd: str) -> str:
     return "\n".join(
         [
             "```",
@@ -54,13 +51,13 @@ class ManifestInterface:
     """Common interface for all manifests"""
 
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         raise NotImplementedError
 
 
 class CondaEnvironmentManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Python Packages",
@@ -76,7 +73,7 @@ class CondaEnvironmentManifest(ManifestInterface):
 
 class AptPackagesManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Apt Packages",
@@ -88,7 +85,7 @@ class AptPackagesManifest(ManifestInterface):
 
 class RPackagesManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## R Packages",
@@ -105,7 +102,7 @@ class RPackagesManifest(ManifestInterface):
 
 class JuliaPackagesManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Julia Packages",
@@ -122,7 +119,7 @@ class JuliaPackagesManifest(ManifestInterface):
 
 class SparkInfoManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Apache Spark",
