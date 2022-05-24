@@ -67,6 +67,18 @@ html_static_path = ["_static"]
 # sphinx-quickstart --project "docker-stacks" --author "Project Jupyter" -v "latest" -r "latest" -l en --no-sep --no-makefile --no-batchfile
 # These are custom options for this project
 
+html_theme = "sphinx_book_theme"
+html_title = "Docker Stacks documentation"
+html_logo = "_static/jupyter-logo.svg"
+html_theme_options = {
+    "path_to_docs": "docs",
+    "repository_url": "https://github.com/jupyter/docker-stacks",
+    "use_edit_page_button": True,
+    "use_issues_button": True,
+    "use_repository_button": True,
+    "use_download_button": True,
+}
+
 extensions = ["myst_parser", "sphinx_copybutton"]
 source_suffix = {
     ".rst": "restructuredtext",
@@ -74,13 +86,18 @@ source_suffix = {
 }
 pygments_style = "sphinx"
 
-html_theme_options = {
-    "description": "Jupyter Docker Stacks",
-    "fixed_sidebar": False,
-    "show_relbars": True,
-    "github_user": "jupyter",
-    "github_repo": "docker-stacks",
-    "github_type": "star",
-    "logo": "jupyter-logo.svg",
-    "logo_text_align": "left",
+# MyST configuration reference: https://myst-parser.readthedocs.io/en/latest/sphinx/reference.html
+myst_heading_anchors = 3
+
+linkcheck_ignore = [
+    r".*github\.com.*#",  # javascript based anchors
+    r"https://docs.github\.com/.*",  # 403 error
+    r"http://127\.0\.0\.1:49153/.*",  # example
+    r"https://mybinder\.org/v2/gh/.*",  # lots of 500 errors
+]
+
+linkcheck_allowed_redirects = {
+    r"https://results\.pre-commit\.ci/latest/github/jupyter/docker-stacks/master": r"https://results\.pre-commit\.ci/run/github/.*",  # Latest master CI build
+    r"https://github\.com/jupyter/docker-stacks/issues/new.*": r"https://github\.com/login.*",  # GitHub wants user to be logon to use this features
+    r"https://github\.com/orgs/jupyter/teams/docker-image-maintainers/members": r"https://github\.com/login.*",
 }

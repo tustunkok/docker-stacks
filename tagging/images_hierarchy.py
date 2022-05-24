@@ -2,29 +2,30 @@
 # Distributed under the terms of the Modified BSD License.
 from dataclasses import dataclass, field
 from typing import Optional
-from .taggers import (
-    TaggerInterface,
-    SHATagger,
+
+from tagging.manifests import (
+    AptPackagesManifest,
+    CondaEnvironmentManifest,
+    JuliaPackagesManifest,
+    ManifestInterface,
+    RPackagesManifest,
+    SparkInfoManifest,
+)
+from tagging.taggers import (
     DateTagger,
-    UbuntuVersionTagger,
-    PythonVersionTagger,
-    JupyterNotebookVersionTagger,
-    JupyterLabVersionTagger,
-    JupyterHubVersionTagger,
-    RVersionTagger,
-    TensorflowVersionTagger,
-    JuliaVersionTagger,
-    SparkVersionTagger,
     HadoopVersionTagger,
     JavaVersionTagger,
-)
-from .manifests import (
-    ManifestInterface,
-    CondaEnvironmentManifest,
-    AptPackagesManifest,
-    RPackagesManifest,
-    JuliaPackagesManifest,
-    SparkInfoManifest,
+    JuliaVersionTagger,
+    JupyterHubVersionTagger,
+    JupyterLabVersionTagger,
+    JupyterNotebookVersionTagger,
+    PythonVersionTagger,
+    RVersionTagger,
+    SHATagger,
+    SparkVersionTagger,
+    TaggerInterface,
+    TensorflowVersionTagger,
+    UbuntuVersionTagger,
 )
 
 

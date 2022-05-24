@@ -5,6 +5,10 @@ FROM $BASE_CONTAINER
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 
+# Fix: https://github.com/hadolint/hadolint/wiki/DL4006
+# Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 USER root
 
 # Install all OS dependencies for fully functional notebook server
@@ -18,15 +22,13 @@ RUN apt-get update --yes && \
     tzdata \
     unzip \
     vim-tiny \
+    # Inkscape is installed to be able to convert SVG files
+    inkscape \
     # git-over-ssh
     openssh-client \
-    # TODO: check if these are needed and describe
-    inkscape \
-    libsm6 \
-    libxext-dev \
-    libxrender1 \
-    lmodern \
-    netcat \
+    # less is needed to run help in R
+    # see: https://github.com/jupyter/docker-stacks/issues/1588
+    less \
     # nbconvert dependencies
     # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
     texlive-xetex \

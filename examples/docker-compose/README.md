@@ -42,8 +42,8 @@ You can customize the docker-stack notebook image to deploy by modifying the `no
 For example, you can build and deploy a `jupyter/all-spark-notebook` by modifying the Dockerfile like so:
 
 ```dockerfile
-FROM jupyter/all-spark-notebook:b418b67c225b
-...
+FROM jupyter/all-spark-notebook:6b49f3337709
+# Your RUN commands and so on
 ```
 
 Once you modify the Dockerfile, don't forget to rebuild the image.
@@ -102,14 +102,17 @@ notebook/up.sh --secure --password a_secret
 Sure. If you want to secure access to publicly addressable notebook containers, you can generate a free certificate using the [Let's Encrypt](https://letsencrypt.org) service.
 
 This example includes the `bin/letsencrypt.sh` script, which runs the `letsencrypt` client to create a full-chain certificate and private key, and stores them in a Docker volume.
-_Note:_ The script hard codes several `letsencrypt` options, one of which automatically agrees to the Let's Encrypt Terms of Service.
+
+```{note}
+The script hard codes several `letsencrypt` options, one of which automatically agrees to the Let's Encrypt Terms of Service.
+```
 
 The following command will create a certificate chain and store it in a Docker volume named `mydomain-secrets`.
 
 ```bash
 FQDN=host.mydomain.com EMAIL=myemail@somewhere.com \
-  SECRETS_VOLUME=mydomain-secrets \
-  bin/letsencrypt.sh
+    SECRETS_VOLUME=mydomain-secrets \
+    bin/letsencrypt.sh
 ```
 
 Now run `up.sh` with the `--letsencrypt` option.
@@ -128,12 +131,12 @@ To hit their staging servers, set the environment variable `CERT_SERVER=--stagin
 
 ```bash
 FQDN=host.mydomain.com EMAIL=myemail@somewhere.com \
-  CERT_SERVER=--staging \
-  bin/letsencrypt.sh
+    CERT_SERVER=--staging \
+    bin/letsencrypt.sh
 ```
 
-Also, be aware that Let's Encrypt certificates are short lived (90 days).
-If you need them for a longer period of time, you'll need to manually setup a cron job to run the renewal steps.
+Also, be aware that Let's Encrypt certificates are short-lived (90 days).
+If you need them for a longer period of time, you'll need to manually set up a cron job to run the renewal steps.
 (You can reuse the command above.)
 
 ### Can I deploy to any Docker Machine host?

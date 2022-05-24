@@ -9,7 +9,11 @@ This page provides details about features specific to one or more images.
 - `-p 4040:4040` - The `jupyter/pyspark-notebook` and `jupyter/all-spark-notebook` images open
   [SparkUI (Spark Monitoring and Instrumentation UI)](https://spark.apache.org/docs/latest/monitoring.html) at default port `4040`,
   this option map `4040` port inside docker container to `4040` port on host machine.
-  Note every new spark context that is created is put onto an incrementing port (ie. 4040, 4041, 4042, etc.), and it might be necessary to open multiple ports.
+
+  ```{note}
+  Every new spark context that is created is put onto an incrementing port (ie. 4040, 4041, 4042, etc.), and it might be necessary to open multiple ports.
+  ```
+
   For example: `docker run -d -p 8888:8888 -p 4040:4040 -p 4041:4041 jupyter/pyspark-notebook`.
 
 #### IPython low-level output capture and forward
@@ -21,7 +25,7 @@ Those logs are still available but only in the container's logs.
 If you want to make them appear in the notebook, you can overwrite the configuration in a user level IPython kernel profile.
 To do that you have to uncomment the following line in your `~/.ipython/profile_default/ipython_kernel_config.py` and restart the kernel.
 
-```Python
+```python
 c.IPKernelApp.capture_fd_output = True
 ```
 
@@ -79,6 +83,12 @@ The following sections provide some examples of how to get started using them.
 
 Spark **local mode** is useful for experimentation on small data when you do not have a Spark cluster available.
 
+```{warning}
+In these examples, Spark spawns all the main execution components in the same single JVM.
+You can read additional info about local mode [here](https://books.japila.pl/apache-spark-internals/local/).
+If you want to use all the CPU one of the simplest way is to setup a [Spark Standalone Cluster](https://spark.apache.org/docs/latest/spark-standalone.html).
+```
+
 ##### Local Mode in Python
 
 In a Python notebook.
@@ -87,7 +97,7 @@ In a Python notebook.
 from pyspark.sql import SparkSession
 
 # Spark session & context
-spark = SparkSession.builder.master('local').getOrCreate()
+spark = SparkSession.builder.master("local").getOrCreate()
 sc = spark.sparkContext
 
 # Sum of the first 100 whole numbers
@@ -98,7 +108,7 @@ rdd.sum()
 
 ##### Local Mode in R
 
-In a R notebook with [SparkR][sparkr].
+In an R notebook with [SparkR][sparkr].
 
 ```R
 library(SparkR)
@@ -115,7 +125,7 @@ dapplyCollect(sdf,
 # 5050
 ```
 
-In a R notebook with [sparklyr][sparklyr].
+In an R notebook with [sparklyr][sparklyr].
 
 ```R
 library(sparklyr)
@@ -162,8 +172,10 @@ Connection to Spark Cluster on **[Standalone Mode](https://spark.apache.org/docs
 2. Run the Docker container with `--net=host` in a location that is network addressable by all of
    your Spark workers.
    (This is a [Spark networking requirement](https://spark.apache.org/docs/latest/cluster-overview.html#components).)
-   - NOTE: When using `--net=host`, you must also use the flags `--pid=host -e TINI_SUBREAPER=true`.
-     See <https://github.com/jupyter/docker-stacks/issues/64> for details.
+
+   ```{note}
+   When using `--net=host`, you must also use the flags `--pid=host -e TINI_SUBREAPER=true`. See <https://github.com/jupyter/docker-stacks/issues/64> for details._
+   ```
 
 **Note**: In the following examples we are using the Spark master URL `spark://master:7077` that shall be replaced by the URL of the Spark master.
 
@@ -177,7 +189,7 @@ see [Spark Configuration][spark-conf] for more information.
 from pyspark.sql import SparkSession
 
 # Spark session & context
-spark = SparkSession.builder.master('spark://master:7077').getOrCreate()
+spark = SparkSession.builder.master("spark://master:7077").getOrCreate()
 sc = spark.sparkContext
 
 # Sum of the first 100 whole numbers
@@ -188,7 +200,7 @@ rdd.sum()
 
 ##### Standalone Mode in R
 
-In a R notebook with [SparkR][sparkr].
+In an R notebook with [SparkR][sparkr].
 
 ```R
 library(SparkR)
@@ -205,7 +217,7 @@ dapplyCollect(sdf,
 # 5050
 ```
 
-In a R notebook with [sparklyr][sparklyr].
+In an R notebook with [sparklyr][sparklyr].
 
 ```R
 library(sparklyr)
@@ -243,6 +255,10 @@ rdd.sum()
 
 ### Define Spark Dependencies
 
+```{note}
+This example is given for [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/hadoop/current/install.html).
+```
+
 Spark dependencies can be declared thanks to the `spark.jars.packages` property
 (see [Spark Configuration](https://spark.apache.org/docs/latest/configuration.html#runtime-environment) for more information).
 
@@ -254,8 +270,7 @@ from pyspark.sql import SparkSession
 spark = (
     SparkSession.builder.appName("elasticsearch")
     .config(
-        "spark.jars.packages",
-        "org.elasticsearch:elasticsearch-spark-30_2.12:7.13.0"
+        "spark.jars.packages", "org.elasticsearch:elasticsearch-spark-30_2.12:7.13.0"
     )
     .getOrCreate()
 )
@@ -272,8 +287,6 @@ USER ${NB_UID}
 
 Jars will be downloaded dynamically at the creation of the Spark session and stored by default in `${HOME}/.ivy2/jars` (can be changed by setting `spark.jars.ivy`).
 
-_Note: This example is given for [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/hadoop/current/install.html)._
-
 ## Tensorflow
 
 The `jupyter/tensorflow-notebook` image supports the use of
@@ -284,7 +297,7 @@ The `jupyter/tensorflow-notebook` image supports the use of
 ```python
 import tensorflow as tf
 
-hello = tf.Variable('Hello World!')
+hello = tf.Variable("Hello World!")
 
 sess = tf.Session()
 init = tf.global_variables_initializer()
@@ -298,7 +311,7 @@ sess.run(hello)
 ```python
 import tensorflow as tf
 
-hello = tf.Variable('Hello Distributed World!')
+hello = tf.Variable("Hello Distributed World!")
 
 server = tf.train.Server.create_local_server()
 sess = tf.Session(server.target)

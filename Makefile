@@ -113,7 +113,7 @@ build-all-multi: $(foreach I, $(MULTI_IMAGES), build-multi/$(I)) $(foreach I, $(
 
 
 check-outdated/%: ## check the outdated mamba/conda packages in a stack and produce a report (experimental)
-	@TEST_IMAGE="$(OWNER)/$(notdir $@)" pytest test/test_outdated.py
+	@TEST_IMAGE="$(OWNER)/$(notdir $@)" pytest tests/base-notebook/test_outdated.py
 check-outdated-all: $(foreach I, $(ALL_IMAGES), check-outdated/$(I)) ## check all the stacks for outdated packages
 
 
@@ -128,21 +128,15 @@ cont-rm-all: ## remove all containers
 
 
 
-dev/%: PORT?=8888
-dev/%: ## run a foreground container for a stack
-	docker run -it --rm -p $(PORT):8888 $(DARGS) $(OWNER)/$(notdir $@)
-
-dev-env: ## install libraries required to build docs and run tests
-	@pip install -r requirements-dev.txt
-
-
-
 docs: ## build HTML documentation
-	sphinx-build docs/ docs/_build/
+	sphinx-build -W --keep-going --color docs/ docs/_build/
+
+linkcheck-docs: ## check broken links
+	sphinx-build -W --keep-going --color -b linkcheck docs/ docs/_build/
 
 
 
-hook/%: WIKI_PATH?=../wiki
+hook/%: WIKI_PATH?=wiki
 hook/%: ## run post-build hooks for an image
 	python3 -m tagging.tag_image --short-image-name "$(notdir $@)" --owner "$(OWNER)" && \
 	python3 -m tagging.create_manifests --short-image-name "$(notdir $@)" --owner "$(OWNER)" --wiki-path "$(WIKI_PATH)"
@@ -164,7 +158,7 @@ img-rm-dang: ## remove dangling images (tagged None)
 
 
 pre-commit-all: ## run pre-commit hook on all files
-	@pre-commit run --all-files || (printf "\n\n\n" && git --no-pager diff --color=always)
+	@pre-commit run --all-files --hook-stage manual
 pre-commit-install: ## set up the git hook scripts
 	@pre-commit --version
 	@pre-commit install
@@ -191,17 +185,16 @@ push-all-multi: $(foreach I, $(MULTI_IMAGES), push-multi/$(I)) $(foreach I, $(AM
 
 
 
-run/%: ## run a bash in interactive mode in a stack
+run-shell/%: ## run a bash in interactive mode in a stack
 	docker run -it --rm $(OWNER)/$(notdir $@) $(SHELL)
 
-run-sudo/%: ## run a bash in interactive mode as root in a stack
-	docker run -it --rm -u root $(OWNER)/$(notdir $@) $(SHELL)
+run-sudo-shell/%: ## run a bash in interactive mode as root in a stack
+	docker run -it --rm --user root $(OWNER)/$(notdir $@) $(SHELL)
 
 
 
-test/%: ## run tests against a stack (only common tests or common tests + specific tests)
+test/%: ## run tests against a stack
 	@echo "::group::test/$(OWNER)/$(notdir $@)"
-	@if [ ! -d "$(notdir $@)/test" ]; then TEST_IMAGE="$(OWNER)/$(notdir $@)" pytest -m "not info" test; \
-	else TEST_IMAGE="$(OWNER)/$(notdir $@)" pytest -m "not info" test $(notdir $@)/test; fi
+	python3 -m tests.run_tests --short-image-name "$(notdir $@)" --owner "$(OWNER)"
 	@echo "::endgroup::"
 test-all: $(foreach I, $(ALL_IMAGES), test/$(I)) ## test all stacks

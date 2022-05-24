@@ -9,122 +9,163 @@ This section provides details about the second.
 
 ## Using the Docker CLI
 
-You can launch a local Docker container from the Jupyter Docker Stacks using the [Docker command line interface](https://docs.docker.com/engine/reference/commandline/cli/).
+You can launch a local Docker container from the Jupyter Docker Stacks using the [Docker command-line interface](https://docs.docker.com/engine/reference/commandline/cli/).
 There are numerous ways to configure containers using the CLI.
 The following are some common patterns.
 
-**Example 1** This command pulls the `jupyter/scipy-notebook` image tagged `b418b67c225b` from Docker Hub if it is not already present on the local host.
+**Example 1:**
+
+This command pulls the `jupyter/scipy-notebook` image tagged `6b49f3337709` from Docker Hub if it is not already present on the local host.
 It then starts a container running a Jupyter Notebook server and exposes the server on host port 8888.
 The server logs appear in the terminal and include a URL to the notebook server.
 
 ```bash
-$ docker run -p 8888:8888 jupyter/scipy-notebook:b418b67c225b
+docker run -it -p 8888:8888 jupyter/scipy-notebook:6b49f3337709
 
-Executing the command: jupyter notebook
-[I 15:33:00.567 NotebookApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
-[W 15:33:01.084 NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-[I 15:33:01.150 NotebookApp] JupyterLab alpha preview extension loaded from /opt/conda/lib/python3.6/site-packages/jupyterlab
-[I 15:33:01.150 NotebookApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
-[I 15:33:01.155 NotebookApp] Serving notebooks from local directory: /home/jovyan
-[I 15:33:01.156 NotebookApp] 0 active kernels
-[I 15:33:01.156 NotebookApp] The Jupyter Notebook is running at:
-[I 15:33:01.157 NotebookApp] http://[all ip addresses on your system]:8888/?token=112bb073331f1460b73768c76dffb2f87ac1d4ca7870d46a
-[I 15:33:01.157 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[C 15:33:01.160 NotebookApp]
+# Entered start.sh with args: jupyter lab
 
-    Copy/paste this URL into your browser when you connect for the first time,
-    to login with a token:
-        http://localhost:8888/?token=112bb073331f1460b73768c76dffb2f87ac1d4ca7870d46a
+# ...
+
+#     To access the server, open this file in a browser:
+#         file:///home/jovyan/.local/share/jupyter/runtime/jpserver-7-open.html
+#     Or copy and paste one of these URLs:
+#         http://042fc8ac2b0c:8888/lab?token=f31f2625f13d131f578fced0fc76b81d10f6c629e92c7099
+#      or http://127.0.0.1:8888/lab?token=f31f2625f13d131f578fced0fc76b81d10f6c629e92c7099
 ```
 
-Pressing `Ctrl-C` shuts down the notebook server but leaves the container intact on disk for later restart or permanent deletion using commands like the following:
+Pressing `Ctrl-C` twice shuts down the notebook server but leaves the container intact on disk for later restart or permanent deletion using commands like the following:
 
 ```bash
 # list containers
-$ docker ps -a
-CONTAINER ID        IMAGE                   COMMAND                  CREATED    STATUS                      PORTS               NAMES
-d67fe77f1a84        jupyter/base-notebook   "tini -- start-noteb…"   44 seconds ago    Exited (0) 39 seconds ago                       cocky_mirzakhani
+docker ps -a
+# CONTAINER ID   IMAGE                                                 COMMAND                  CREATED          STATUS                     PORTS     NAMES
+# 221331c047c4   jupyter/scipy-notebook:6b49f3337709                   "tini -g -- start-no…"   11 seconds ago   Exited (0) 8 seconds ago             cranky_benz
 
 # start the stopped container
-$ docker start -a d67fe77f1a84
-Executing the command: jupyter notebook
-[W 16:45:02.020 NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-...
+docker start -a 221331c047c4
+# Entered start.sh with args: jupyter lab
+# ...
 
 # remove the stopped container
-$ docker rm d67fe77f1a84
-d67fe77f1a84
+docker rm 221331c047c4
+# 221331c047c4
 ```
 
-**Example 2** This command pulls the `jupyter/r-notebook` image tagged `b418b67c225b` from Docker Hub if it is not already present on the local host.
+**Example 2:**
+
+This command pulls the `jupyter/r-notebook` image tagged `6b49f3337709` from Docker Hub if it is not already present on the local host.
 It then starts a container running a Jupyter Notebook server and exposes the server on host port 10000.
-The server logs appear in the terminal and include a URL to the notebook server, but with the internal container port (8888) instead of the the correct host port (10000).
+The server logs appear in the terminal and include a URL to the notebook server, but with the internal container port (8888) instead of the correct host port (10000).
 
 ```bash
-$ docker run --rm -p 10000:8888 -v "${PWD}":/home/jovyan/work jupyter/r-notebook:b418b67c225b
-
-Executing the command: jupyter notebook
-[I 19:31:09.573 NotebookApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
-[W 19:31:11.930 NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-[I 19:31:12.085 NotebookApp] JupyterLab alpha preview extension loaded from /opt/conda/lib/python3.6/site-packages/jupyterlab
-[I 19:31:12.086 NotebookApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
-[I 19:31:12.117 NotebookApp] Serving notebooks from local directory: /home/jovyan
-[I 19:31:12.117 NotebookApp] 0 active kernels
-[I 19:31:12.118 NotebookApp] The Jupyter Notebook is running at:
-[I 19:31:12.119 NotebookApp] http://[all ip addresses on your system]:8888/?token=3b8dce890cb65570fb0d9c4a41ae067f7604873bd604f5ac
-[I 19:31:12.120 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[C 19:31:12.122 NotebookApp]
-
-    Copy/paste this URL into your browser when you connect for the first time,
-    to login with a token:
-        http://localhost:8888/?token=3b8dce890cb65570fb0d9c4a41ae067f7604873bd604f5ac
+docker run -it --rm -p 10000:8888 -v "${PWD}":/home/jovyan/work jupyter/r-notebook:6b49f3337709
 ```
 
-Pressing `Ctrl-C` shuts down the notebook server and immediately destroys the Docker container.
-Files written to `~/work` in the container remain touched.
-Any other changes made in the container are lost.
+Pressing `Ctrl-C` twice shuts down the notebook server and immediately destroys the Docker container.
+New files and changes in `~/work` in the container will be preserved.
+Any other changes made in the container will be lost.
 
-**Example 3** This command pulls the `jupyter/all-spark-notebook` image currently tagged `latest` from Docker Hub if an image tagged `latest` is not already present on the local host.
+**Example 3:**
+
+This command pulls the `jupyter/all-spark-notebook` image currently tagged `latest` from Docker Hub if an image tagged `latest` is not already present on the local host.
 It then starts a container named `notebook` running a JupyterLab server and exposes the server on a randomly selected port.
 
 ```bash
 docker run -d -P --name notebook jupyter/all-spark-notebook
 ```
 
-The assigned port and notebook server token are visible using other Docker commands.
+where:
+
+- `-d`: will run the container in detached mode
+
+You can also use the following docker commands to see the port and notebook server token:
 
 ```bash
 # get the random host port assigned to the container port 8888
-$ docker port notebook 8888
-0.0.0.0:32769
+docker port notebook 8888
+# 0.0.0.0:49153
+# :::49153
 
 # get the notebook token from the logs
-$ docker logs --tail 3 notebook
-    Copy/paste this URL into your browser when you connect for the first time,
-    to login with a token:
-        http://localhost:8888/?token=15914ca95f495075c0aa7d0e060f1a78b6d94f70ea373b00
+docker logs --tail 3 notebook
+    # Or copy and paste one of these URLs:
+    #     http://878f1a9b4dfa:8888/lab?token=d336fa63c03f064ff15ce7b269cab95b2095786cf9ab2ba3
+    #  or http://127.0.0.1:8888/lab?token=d336fa63c03f064ff15ce7b269cab95b2095786cf9ab2ba3
 ```
 
-Together, the URL to visit on the host machine to access the server in this case is <http://localhost:32769?token=15914ca95f495075c0aa7d0e060f1a78b6d94f70ea373b00>.
+Together, the URL to visit on the host machine to access the server, in this case, is <http://127.0.0.1:49153/lab?token=d336fa63c03f064ff15ce7b269cab95b2095786cf9ab2ba3>.
 
-The container runs in the background until stopped and/or removed by additional Docker commands.
+The container runs in the background until stopped and/or removed by additional Docker commands:
 
 ```bash
 # stop the container
 docker stop notebook
-notebook
+# notebook
 
 # remove the container permanently
 docker rm notebook
-notebook
+# notebook
 ```
+
+## Using the Podman CLI
+
+An alternative to using the Docker CLI is to use the Podman CLI. Podman is mostly compatible with Docker.
+
+**Example 4:**
+
+If we use Podman instead of Docker in the situation given in _Example 2_, it would look like this:
+
+The example makes use of rootless Podman, in other words, the Podman command is run from a regular user account.
+In a Bash shell set the shell variables _uid_ and _gid_ to the UID and GID of the user _jovyan_ in the container.
+
+```bash
+uid=1000
+gid=100
+```
+
+Set the shell variables _subuidSize_ and _subgidSize_ to the number of subordinate UIDs and GIDs respectively.
+
+```bash
+subuidSize=$(( $(podman info --format "{{ range .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+subgidSize=$(( $(podman info --format "{{ range .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+```
+
+This command pulls the `docker.io/jupyter/r-notebook` image tagged `6b49f3337709` from Docker Hub if it is not already present on the local host.
+It then starts a container running a Jupyter Server and exposes the server on host port 10000.
+The server logs appear in the terminal and include a URL to the notebook server, but with the internal container port (8888) instead of the correct host port (10000).
+
+```bash
+podman run -it --rm -p 10000:8888 \
+    -v "${PWD}":/home/jovyan/work --user $uid:$gid \
+    --uidmap $uid:0:1 --uidmap 0:1:$uid --uidmap $(($uid+1)):$(($uid+1)):$(($subuidSize-$uid)) \
+    --gidmap $gid:0:1 --gidmap 0:1:$gid --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid)) \
+    docker.io/jupyter/r-notebook:6b49f3337709
+```
+
+```{warning}
+The `podman run` options `--uidmap` and `--gidmap` can be used to map the container user _jovyan_ to the regular user on the host when running rootless Podman.
+The same Podman command should not be run with sudo (i.e. running rootful Podman),
+because then the mapping would map the container user _jovyan_ to the root user on the host.
+It's a good security practice to run programs with as few privileges as possible.
+```
+
+```{note}
+The `podman run` command in the example above maps all subuids and subgids of the user into the container.
+That works fine but is actually more than needed.
+The `podman run` option `--userns=auto` will, for instance, not be possible to use as long as there are no unused subuids and subgids available.
+The example could be improved by investigating more in detail which UIDs and GIDs need to be available in the container and then only map them.
+```
+
+Pressing `Ctrl-C` twice shuts down the notebook server and immediately destroys the Docker container.
+New files and changes in `~/work` in the container will be preserved.
+Any other changes made in the container will be lost.
 
 ## Using Binder
 
 [Binder](https://mybinder.org/) is a service that allows you to create and share custom computing environments for projects in version control.
 You can use any of the Jupyter Docker Stacks images as a basis for a Binder-compatible Dockerfile.
 See the
-[docker-stacks example](https://mybinder.readthedocs.io/en/latest/sample_repos.html#using-a-docker-image-from-the-jupyter-docker-stacks-repository) and
+[docker-stacks example](https://mybinder.readthedocs.io/en/latest/examples/sample_repos.html#using-a-docker-image-from-the-jupyter-docker-stacks-repository) and
 [Using a Dockerfile](https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html) sections in the
 [Binder documentation](https://mybinder.readthedocs.io/en/latest/index.html) for instructions.
 
@@ -133,7 +174,7 @@ See the
 You can configure JupyterHub to launcher Docker containers from the Jupyter Docker Stacks images.
 If you've been following the [Zero to JupyterHub with Kubernetes](https://zero-to-jupyterhub.readthedocs.io/en/latest/) guide,
 see the [Use an existing Docker image](https://zero-to-jupyterhub.readthedocs.io/en/latest/jupyterhub/customizing/user-environment.html#choose-and-use-an-existing-docker-image) section for details.
-If you have a custom JupyterHub deployment, see the [Picking or building a Docker image](https://github.com/jupyterhub/dockerspawner#picking-or-building-a-docker-image)
+If you have a custom JupyterHub deployment, see the [Picking or building a Docker image](https://jupyterhub-dockerspawner.readthedocs.io/en/latest/docker-image.html)
 instructions for the [dockerspawner](https://github.com/jupyterhub/dockerspawner) instead.
 
 ## Using Other Tools and Services

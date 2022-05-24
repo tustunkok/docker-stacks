@@ -4,7 +4,7 @@ In order to enforce some rules **linters** are used in this project.
 Linters can be run either during the **development phase** (by the developer) and during **integration phase** (by GitHub Actions).
 To integrate and enforce this process in the project lifecycle we are using **git hooks** through [pre-commit][pre-commit].
 
-## Pre-commit hook
+## Using pre-commit hooks
 
 ### Pre-commit hook installation
 
@@ -13,9 +13,9 @@ This can be achieved by using the generic task used to install all Python develo
 
 ```sh
 # Install all development dependencies for the project
-$ make dev-env
+pip install requirements-dev.txt
 # It can also be installed directly
-$ pip install pre-commit
+pip install pre-commit
 ```
 
 Then the git hooks scripts configured for the project in `.pre-commit-config.yaml` need to be installed in the local git repository.
@@ -27,9 +27,11 @@ make pre-commit-install
 ### Run
 
 Now pre-commit (and so configured hooks) will run automatically on `git commit` on each changed file.
-However it is also possible to trigger it against all files.
+However, it is also possible to trigger it against all files.
 
-- Note: Hadolint pre-commit uses docker to run, so docker should be running while running this command.
+```{note}
+Hadolint pre-commit uses docker to run, so docker should be running while running this command.
+```
 
 ```sh
 make pre-commit-all
@@ -37,7 +39,7 @@ make pre-commit-all
 
 ## Image Lint
 
-To comply with [Docker best practices][dbp], we are using the [Hadolint][hadolint] tool to analyse each `Dockerfile` .
+To comply with [Docker best practices][dbp], we are using the [Hadolint][hadolint] tool to analyse each `Dockerfile`.
 
 ### Ignoring Rules
 

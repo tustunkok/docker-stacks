@@ -1,13 +1,17 @@
-name: Build Sphinx Documentation
+name: Build Sphinx Documentation and check links
 
 on:
+  schedule:
+    # Weekly, at 03:00 on Monday UTC time
+    - cron: "0 3 * * 1"
   pull_request:
     paths:
       - ".github/workflows/sphinx.yml"
 
       - "docs/**"
+      - "README.md"
       - ".readthedocs.yaml"
-      - "requirements-dev.txt"
+      - "requirements-docs.txt"
   push:
     branches:
       - main
@@ -16,30 +20,35 @@ on:
       - ".github/workflows/sphinx.yml"
 
       - "docs/**"
+      - "README.md"
       - ".readthedocs.yaml"
-      - "requirements-dev.txt"
+      - "requirements-docs.txt"
   workflow_dispatch:
 
 jobs:
   build-docs:
     name: Build Sphinx Documentation
+    if: github.event_name != 'schedule' || (github.event_name == 'schedule' && github.repository == 'jupyter/docker-stacks')
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
+      - name: Checkout Repo ⚡️
+        uses: actions/checkout@v3
 
-      - name: Set Up Python
-        uses: actions/setup-python@v2
+      - name: Set Up Python 🐍
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.x
+          python-version: 3.9
 
-      - name: Install Dev Dependencies
+      - name: Install Doc Dependencies 📦
         run: |
-          python -m pip install --upgrade pip
-          make dev-env
+          pip install --upgrade pip
+          pip install -r requirements-docs.txt
 
-      - name: Build Documentation
+      - name: Build Documentation 📖
         run: make docs
+
+      - name: Check Documentation URLs 🔗
+        run: make linkcheck-docs

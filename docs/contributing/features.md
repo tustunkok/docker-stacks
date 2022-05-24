@@ -8,10 +8,10 @@ community with the cost of maintaining the images over time.
 
 Please follow the process below to suggest a new feature for inclusion in one of the core stacks:
 
-1. [Open a GitHub issue](https://github.com/jupyter/docker-stacks/issues) describing the feature
-   you'd like to contribute.
+1. Open a [GitHub feature request issue](https://github.com/jupyter/docker-stacks/issues/new?assignees=&labels=type%3AEnhancement&template=feature_request.md&title=)
+   describing the feature you'd like to contribute.
 2. Discuss with the maintainers whether the addition makes sense in
-   [one of the core stacks](../using/selecting.html#core-stacks), as a
+   [one of the core stacks](../using/selecting.md#core-stacks), as a
    [recipe in the documentation](recipes.md), as a [community stack](stacks.md), or as something
    else entirely.
 
@@ -37,8 +37,9 @@ Roughly speaking, we evaluate new features based on the following criteria:
 If there's agreement that the feature belongs in one or more of the core stacks:
 
 1. Implement the feature in a local clone of the `jupyter/docker-stacks` project.
-2. Please build the image locally before submitting a pull request
-   Building the image locally shortens the debugging cycle by taking some load off GitHub Actions, which graciously provide free build services for open source projects like this one.
+2. Please, build the image locally before submitting a pull request.
+   It shortens the debugging cycle by taking some load off GitHub Actions,
+   which graciously provides free build services for open source projects like this one.
    If you use `make`, call:
 
    ```bash
